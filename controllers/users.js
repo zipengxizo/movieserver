@@ -3,6 +3,7 @@ var { Email , Head } = require('../untils/config.js');
 var UserModel = require('../models/users.js');
 var fs = require('fs');
 var url = require('url');
+const jwt = require('jsonwebtoken');
 var { setCrypto , createVerify } = require('../untils/base.js');
 
 var login = async (req,res,next)=>{
@@ -26,6 +27,12 @@ var login = async (req,res,next)=>{
 		req.session.username = username;
 		req.session.isAdmin = result.isAdmin;
 		req.session.userHead = result.userHead;
+		//生成token
+		let content = {name:req.body.username}
+		let secretOrPrivateKey = "zipeng";
+		let token = jwt.sign(content,secretOrPrivateKey,{
+			expiresIn:60*60*1000
+		})
 		
 		if(result.isFreeze){
 			res.send({
@@ -36,7 +43,10 @@ var login = async (req,res,next)=>{
 		else{
 			res.send({
 				msg : '登录成功',
-				status : 0
+				status : 0,
+				data :{
+					token : token
+				}
 			});
 		}
 		
