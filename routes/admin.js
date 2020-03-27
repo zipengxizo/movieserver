@@ -1,20 +1,34 @@
 var express = require('express');
 var adminController = require('../controllers/admin.js');
+const jwt = require('jsonwebtoken');
 var router = express.Router();
 
 /* GET users listing. */
 
 router.use((req,res,next)=>{
-
-	if( req.session.username && req.session.isAdmin ){
-		next();
-	}
-	else{
-		res.send({
-			msg : '没有管理权限',
-			status : -1
-		});
-	}
+	//验证token
+	let token = req.headers.token;
+	let secretOrPrivateKey = "zipeng";
+	jwt.verify(token,secretOrPrivateKey,(err,decode)=>{
+		if (err) {
+			res.send({
+				msg : '没有管理权限,token失效',
+				status : -1
+			});
+		}
+		else{
+			next();
+		}
+	})
+	// if( req.session.username && req.session.isAdmin ){
+	// 	next();
+	// }
+	// else{
+	// 	res.send({
+	// 		msg : '没有管理权限',
+	// 		status : -1
+	// 	});
+	// }
 
 });
 
