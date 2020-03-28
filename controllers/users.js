@@ -31,7 +31,7 @@ var login = async (req,res,next)=>{
 		let content = {name:req.body.username}
 		let secretOrPrivateKey = "zipeng";
 		let token = jwt.sign(content,secretOrPrivateKey,{
-			expiresIn:1000
+			expiresIn:60*60*24
 		})
 		
 		if(result.isFreeze){
@@ -111,9 +111,9 @@ var verify = async (req,res,next)=>{
 	req.session.time = Email.time;
 
 	var mailOptions = {
-	    from: '喵喵网 new666@qq.com',
+	    from: 'new666@qq.com',
 	    to: email,
-	    subject: '喵喵网邮箱验证码',
+	    subject: '网邮箱验证码',
 	    text: '验证码：' + verify
 	}
 
@@ -139,8 +139,7 @@ var verify = async (req,res,next)=>{
 };
 
 var logout = async (req,res,next)=>{
-	req.session.username = null;
-	req.session.isAdmin = null;
+	req.session.username = '';
 	res.send({
 		msg : '退出成功',
 		status : 0
