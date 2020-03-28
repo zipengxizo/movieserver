@@ -31,7 +31,7 @@ var login = async (req,res,next)=>{
 		let content = {name:req.body.username}
 		let secretOrPrivateKey = "zipeng";
 		let token = jwt.sign(content,secretOrPrivateKey,{
-			expiresIn:60*60*1000
+			expiresIn:1000
 		})
 		
 		if(result.isFreeze){
@@ -139,7 +139,8 @@ var verify = async (req,res,next)=>{
 };
 
 var logout = async (req,res,next)=>{
-	req.session.username = '';
+	req.session.username = null;
+	req.session.isAdmin = null;
 	res.send({
 		msg : '退出成功',
 		status : 0
