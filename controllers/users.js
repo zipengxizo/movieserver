@@ -5,6 +5,43 @@ var fs = require('fs');
 var url = require('url');
 const jwt = require('jsonwebtoken');
 var { setCrypto , createVerify } = require('../untils/base.js');
+var request = require('request');
+
+var loginWeixin = async (req,res,next) =>{
+	var { code } = req.query;
+	var appid = 'wx2fabe09bd81eee32';
+	var secret = '0e52139370d1fc8dcea09be40be337f2';
+	var baseUrl = 'https://api.weixin.qq.com/sns/jscode2session'
+	var code2SessionUrl = baseUrl + '?appid='+appid+'&secret='+secret+'&js_code='+code+'&grant_type=authorization_code'
+	request(code2SessionUrl, function (error, response) {
+		if (!error && response.statusCode == 200) {
+			var obj = JSON.parse(response.body);
+			var openid = obj.openid;
+			var session_key = obj.session_key;
+			//生成token
+			let secretOrPrivateKey = openid + session_key;
+			let token = jwt.sign(obj,secretOrPrivateKey,{
+				expiresIn:60*60*24
+			});
+			//要用redis把token和username,password,isAdmin等字段，用key和value存起来
+			
+			res.send({
+				msg : '登录成功',
+				status : 0,
+				data :{
+					token : token,
+					openid : openid
+				}
+			});
+
+		}else{
+			res.send({
+				msg : '登录失败',
+				status : -1
+			});
+		}
+	})
+}
 
 var login = async (req,res,next)=>{
 	var { username , password , verifyImg } = req.body;
@@ -27,12 +64,14 @@ var login = async (req,res,next)=>{
 		req.session.username = username;
 		req.session.isAdmin = result.isAdmin;
 		req.session.userHead = result.userHead;
+		req.session.password = result.password;
 		//生成token
 		let content = {name:req.body.username}
-		let secretOrPrivateKey = "zipeng";
+		let secretOrPrivateKey = result.username + result.password;
 		let token = jwt.sign(content,secretOrPrivateKey,{
 			expiresIn:60*60*24
-		})
+		});
+		//要用redis把token和username,password,isAdmin等字段，用key和value存起来
 		
 		if(result.isFreeze){
 			res.send({
@@ -236,5 +275,6 @@ module.exports = {
 	getUser,
 	findPassword,
 	verifyImg,
-	uploadUserHead
+	uploadUserHead,
+	loginWeixin
 };

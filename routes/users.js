@@ -12,6 +12,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/login' , usersController.login );
+router.get('/loginWeixin',usersController.loginWeixin)
 router.post('/register' , usersController.register );
 router.get('/verify' , usersController.verify );
 router.get('/logout' , usersController.logout );

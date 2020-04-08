@@ -8,7 +8,7 @@ var router = express.Router();
 router.use((req,res,next)=>{
 	//验证token
 	let token = req.headers.token;
-	let secretOrPrivateKey = "zipeng";
+	let secretOrPrivateKey = req.session.username + req.session.password;
 	let {fullPath} = req.body;
 	jwt.verify(token,secretOrPrivateKey,(err,decode)=>{
 		if (err) {
