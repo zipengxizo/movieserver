@@ -1,12 +1,30 @@
-﻿
-var mongoose = require('mongoose');
+﻿var mongoose = require('mongoose');
 var nodemailer = require('nodemailer');
+var redis = require('redis');
+
+var client = redis.createClient(6379, 'localhost');
+
+client.on('connect',function(){
+    console.log('redis 连接成功');
+});
+client.on('error', function (err) {
+    console.log('redis 连接失败');
+});
+client.on('ready',function(res){
+    console.log('redis is ready');
+});
+
+client.on('end',function(err){
+    console.log('redis is end');
+});
 
 var Mongoose = {
-	url : 'mongodb://localhost:27017/miaomiao',
-	connect(){
-		mongoose.connect(this.url , { useNewUrlParser: true }, (err)=>{
-			if(err){
+	url: 'mongodb://localhost:27017/miaomiao',
+	connect() {
+		mongoose.connect(this.url, {
+			useNewUrlParser: true
+		}, (err) => {
+			if (err) {
 				console.log('数据库连接失败');
 				return;
 			}
@@ -16,27 +34,27 @@ var Mongoose = {
 };
 
 var Email = {
-	config : {
+	config: {
 		host: "smtp.qq.com",
-	    port: 587,
-	    auth: {
-	      user: 'new666@qq.com', 
-	      pass: 'xxxxxxxxxx'
-	    }
+		port: 587,
+		auth: {
+			user: 'new666@qq.com',
+			pass: 'xxxxxxxxxx'
+		}
 	},
-	get transporter(){
+	get transporter() {
 		return nodemailer.createTransport(this.config);
 	},
-	get verify(){
-		return Math.random().toString().substring(2,6);
+	get verify() {
+		return Math.random().toString().substring(2, 6);
 	},
-	get time(){
+	get time() {
 		return Date.now();
 	}
 };
 
 var Head = {
-	baseUrl : 'http://localhost:3000/uploads/'
+	baseUrl: 'http://localhost:3000/uploads/'
 }
 
 module.exports = {

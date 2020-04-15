@@ -2,42 +2,54 @@ var express = require('express');
 var adminController = require('../controllers/admin.js');
 const jwt = require('jsonwebtoken');
 var router = express.Router();
+var redis = require('redis');
+const client = redis.createClient(6379, 'localhost');
 
 /* GET users listing. */
 
-router.use((req,res,next)=>{
+router.use((req, res, next) => {
+	let {
+		fullPath
+	} = req.body;
 	//验证token
 	let token = req.headers.token;
-	let secretOrPrivateKey = req.session.username + req.session.password;
-	let {fullPath} = req.body;
-	jwt.verify(token,secretOrPrivateKey,(err,decode)=>{
-		if (err) {
+	var username, password, isAdmin;
+	console.log('token cookie=',token)
+	client.get(token, function (err, v) {
+		console.log(err,v)
+		if (!err && v) {
+			username = JSON.parse(v).username;
+			password = JSON.parse(v).password;
+			isAdmin = JSON.parse(v).isAdmin;
+			roles = JSON.parse(v).roles;
+			let secretOrPrivateKey = username + password;
+			jwt.verify(token, secretOrPrivateKey, (err, decode) => {
+				if (err) {
+					res.statusCode = 401;
+					res.send({
+						msg: 'token失效',
+						fullPath: fullPath,
+						status: -1
+					});
+				} else {
+					next();
+				}
+			})
+		} else {
 			res.statusCode = 401;
 			res.send({
-				msg : 'token失效',
-				fullPath : fullPath,
-				status : -1
+				msg: 'token失效',
+				fullPath: fullPath,
+				status: -1
 			});
+
 		}
-		else{
-			if (req.session.username && req.session.isAdmin) {
-				next();
-			}
-			else{
-				res.statusCode = 403;
-				res.send({
-					msg : '没有管理员权限',
-					status : -1,
-					fullPath : fullPath
-				})
-			}
-		}
-	})
+	});
 });
 
 router.post('/', adminController.index);
-router.get('/usersList',adminController.usersList);
-router.post('/updateFreeze' , adminController.updateFreeze);
-router.post('/deleteUser' , adminController.deleteUser);
+router.get('/usersList', adminController.usersList);
+router.post('/updateFreeze', adminController.updateFreeze);
+router.post('/deleteUser', adminController.deleteUser);
 
 module.exports = router;

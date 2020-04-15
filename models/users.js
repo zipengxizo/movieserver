@@ -10,7 +10,8 @@ var UserSchema = new mongoose.Schema({
 	date : { type : Date , default : Date.now() },
 	isAdmin : { type : Boolean , default : false },
 	isFreeze : { type : Boolean , default : false },
-	userHead : { type : String , default : url.resolve(Head.baseUrl , 'default.jpg') }
+	userHead : { type : String , default : url.resolve(Head.baseUrl , 'default.jpg') },
+	roles : { type : Array , required : true},
 });
 
 var UserModel = mongoose.model('user' , UserSchema);
