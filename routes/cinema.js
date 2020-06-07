@@ -1,5 +1,5 @@
 var express = require('express');
-var movieController = require('../controllers/movie.js');
+var cinemaController = require('../controllers/cinema.js');
 var router = express.Router();
 
 var multer  = require('multer');
@@ -11,7 +11,7 @@ router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
 
-router.post('/movieOnInfoList',movieController.movieList);
+router.get('/cinemaList',cinemaController.cinemaList);
 
 
 module.exports = router;

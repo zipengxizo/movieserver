@@ -1,8 +1,9 @@
 ﻿var mongoose = require('mongoose');
 var nodemailer = require('nodemailer');
 var redis = require('redis');
-
-var client = redis.createClient(6379, 'localhost');
+var {redisip,auth} = require('./base');
+var client = redis.createClient(6379, redisip);
+client.auth(auth);
 
 client.on('connect',function(){
     console.log('redis 连接成功');
@@ -19,16 +20,16 @@ client.on('end',function(err){
 });
 
 var Mongoose = {
-	url: 'mongodb://localhost:27017/miaomiao',
+	url: 'mongodb://xzp:xzp362430%40@localhost:27017/miaomiao?authSource=admin',
 	connect() {
 		mongoose.connect(this.url, {
 			useNewUrlParser: true
 		}, (err) => {
 			if (err) {
-				console.log('数据库连接失败');
+				console.log('mongodb连接失败');
 				return;
 			}
-			console.log('数据库连接成功');
+			console.log('mongodb连接成功');
 		});
 	}
 };

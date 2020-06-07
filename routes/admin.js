@@ -3,7 +3,9 @@ var adminController = require('../controllers/admin.js');
 const jwt = require('jsonwebtoken');
 var router = express.Router();
 var redis = require('redis');
-const client = redis.createClient(6379, 'localhost');
+var {redisip,auth} = require('../untils/base');
+const client = redis.createClient(6379, redisip);
+client.auth(auth);
 
 /* GET users listing. */
 
@@ -14,7 +16,6 @@ router.use((req, res, next) => {
 	//验证token
 	let token = req.headers.token;
 	var username, password, isAdmin;
-	console.log('token cookie=',token)
 	client.get(token, function (err, v) {
 		console.log(err,v)
 		if (!err && v) {

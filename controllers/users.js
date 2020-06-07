@@ -12,7 +12,9 @@ var {
 } = require('../untils/base.js');
 var request = require('request');
 var redis = require('redis');
-const client = redis.createClient(6379, 'localhost');
+var {redisip,auth} = require('../untils/base');
+const client = redis.createClient(6379, redisip);
+client.auth(auth)
 
 var loginWeixin = async (req, res, next) => {
 	var {

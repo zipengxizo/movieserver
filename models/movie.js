@@ -23,7 +23,6 @@ var movieModel = mongoose.model('movies' , movieSchema);
 movieModel.createIndexes();
 
 var moviesList = ()=>{
-	console.log('test')
 	return movieModel.find((err,res)=>{});
 }
 

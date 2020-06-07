@@ -10,6 +10,8 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var adminRouter = require('./routes/admin');
 var movieRouter = require('./routes/movie');
+var cinemaRouter = require('./routes/cinema');
+var cityRouter = require('./routes/city');
 
 var app = express();
 
@@ -27,6 +29,16 @@ app.use(session({
   }
 }));
 
+// 自定义跨域中间件
+var allowCors = function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', 'http://172.20.10.5:3333');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Access-Control-Allow-Credentials','true');
+  next();
+};
+app.use(allowCors);//使用跨域中间件
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -37,6 +49,8 @@ app.use('/', indexRouter);
 app.use('/api2/users', usersRouter);
 app.use('/api2/admin', adminRouter);
 app.use('/api2/movie', movieRouter);
+app.use('/api2/cinema', cinemaRouter);
+app.use('/api2/city', cityRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
